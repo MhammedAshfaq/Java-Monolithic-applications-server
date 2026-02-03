@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: spring-monolith-template
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/e-hospital
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+    hikari:
+      pool-name: HikariPool
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 30000        # 30 seconds
+      max-lifetime: 1800000     # 30 minutes
+      connection-timeout: 20000 # 20 seconds
+      validation-timeout: 5000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    validate-on-migrate: false
+
+
+# Server configuration
+server:
+  address: 0.0.0.0
+  port: 8082
+
+# Swagger configuration
+springdoc:
+  swagger-ui:
+    path: /apidocs
+  api-docs:
+    path: /v1/api-docs
