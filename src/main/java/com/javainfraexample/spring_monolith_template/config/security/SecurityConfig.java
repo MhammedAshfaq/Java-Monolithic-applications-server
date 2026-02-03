@@ -16,8 +16,16 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/",
                     "/health",
+                    "/api/**",
                     "/apidocs/**",
-                    "/v1/api-docs/**"
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/v1/api-docs",
+                    "/v1/api-docs/**",
+                    "/v3/api-docs",
+                    "/v3/api-docs/**",
+                    "/swagger-resources/**",
+                    "/webjars/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             );
