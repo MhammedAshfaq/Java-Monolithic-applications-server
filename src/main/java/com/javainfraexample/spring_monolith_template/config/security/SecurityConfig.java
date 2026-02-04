@@ -15,6 +15,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/",
+                    "/dev",
+                    "/dev/**",
                     "/health",
                     "/api/**",
                     "/apidocs/**",
@@ -25,7 +27,9 @@ public class SecurityConfig {
                     "/v3/api-docs",
                     "/v3/api-docs/**",
                     "/swagger-resources/**",
-                    "/webjars/**"
+                    "/webjars/**",
+                    "/actuator",
+                    "/actuator/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             );

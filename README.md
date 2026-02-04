@@ -10,6 +10,7 @@ A production-ready Spring Boot monolith template with comprehensive features inc
 - [Database Setup](#database-setup)
 - [Running the Application](#running-the-application)
 - [API Documentation](#api-documentation)
+- [Documentation](#documentation)
 - [Project Structure](#project-structure)
 - [Configuration](#configuration)
 - [Testing](#testing)
@@ -144,6 +145,19 @@ Once the application is running, access the interactive API documentation at:
 - Try-it-out functionality enabled
 - Operations sorted by HTTP method
 - Tags sorted alphabetically
+
+## 📖 Documentation
+
+Developer and operations documentation is maintained in the **[docs](docs/)** folder:
+
+| Document | Description |
+|----------|-------------|
+| [docs/README.md](docs/README.md) | Documentation index and quick links |
+| [Developer guide](docs/developer-guide.md) | Local setup, running the app, testing, conventions |
+| [Dev tools](docs/dev-tools.md) | Developer dashboard (Swagger, RabbitMQ, Redis, DB health, Actuator) — dev profile only |
+| [Production](docs/production.md) | Production deployment, profiles, and security |
+
+**Dev tools**: With the default `dev` profile, the developer dashboard is at [http://localhost:8082](http://localhost:8082) or [http://localhost:8082/dev](http://localhost:8082/dev). It is **not** available in production when using the `prod` profile.
 
 ## 📁 Project Structure
 

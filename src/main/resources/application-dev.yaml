@@ -1,0 +1,31 @@
+# Dev profile: Developer Dashboard, Actuator, RabbitMQ link
+# Activate with: spring.profiles.active=dev or --spring.profiles.active=dev
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  data:
+    redis:
+      # Redis with password. URL form ensures auth is applied (same as redis-cli AUTH yourStrongPassword123).
+      # Override: SPRING_DATA_REDIS_URL=redis://:yourStrongPassword123@localhost:6379
+      url: redis://:yourStrongPassword123@localhost:6379
+
+# Actuator: expose useful endpoints for dev (do NOT expose all in prod)
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info,metrics,env
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# Dev dashboard links (used by DevDashboardController)
+app:
+  dev-dashboard:
+    # RabbitMQ Management UI (default: local Docker/host)
+    rabbitmq-management-url: http://localhost:15672
+    # Optional: H2 console base URL if you use H2 in dev
+    # h2-console-url: http://localhost:8082/h2-console

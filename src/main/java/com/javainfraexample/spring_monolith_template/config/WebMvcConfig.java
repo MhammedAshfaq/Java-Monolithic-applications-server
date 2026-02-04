@@ -26,7 +26,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
             if (!c.isAnnotationPresent(org.springframework.web.bind.annotation.RestController.class)) {
                 return false;
             }
-            
+            // Dev dashboard and similar non-API controllers: no /api prefix
+            if (c.getPackageName().startsWith("com.javainfraexample.spring_monolith_template.api.dev")) {
+                return false;
+            }
             // Check if the controller has a RequestMapping with an excluded path
             RequestMapping requestMapping = c.getAnnotation(RequestMapping.class);
             if (requestMapping != null) {
@@ -37,7 +40,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
                     }
                 }
             }
-            
             return true;
         });
     }
