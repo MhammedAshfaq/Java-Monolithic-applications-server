@@ -1,4 +1,4 @@
-package com.javainfraexample.spring_monolith_template.api.health;
+package com.javainfraexample.spring_monolith_template.services.health;
 
 import org.springframework.stereotype.Service;
 
@@ -6,9 +6,6 @@ import com.javainfraexample.spring_monolith_template.common.dto.ApiResponseDto;
 
 import lombok.RequiredArgsConstructor;
 
-/**
- * Service for health check operations. All health-related logic is kept in the api/health package.
- */
 @Service
 @RequiredArgsConstructor
 public class HealthCheckService {
@@ -19,7 +16,9 @@ public class HealthCheckService {
     /**
      * Performs health check and returns the status payload.
      */
-    public ApiResponseDto<String> check() {
+    public ApiResponseDto<String> check (){
         return ApiResponseDto.success(HEALTH_MESSAGE, HEALTH_STATUS);
+
     }
+    
 }

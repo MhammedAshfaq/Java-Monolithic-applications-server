@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.javainfraexample.spring_monolith_template.common.dto.ApiResponseDto;
+import com.javainfraexample.spring_monolith_template.services.health.HealthCheckService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

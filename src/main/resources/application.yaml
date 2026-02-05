@@ -40,6 +40,23 @@ spring:
       password: yourStrongPassword123
       timeout: 3000ms
 
+# Rate limiting configuration
+app:
+  rate-limit:
+    enabled: true
+    # Short-term: Burst protection (100 requests per minute)
+    short-term:
+      max-requests: 100
+      window-seconds: 60
+    # Long-term: Overall usage cap (1000 requests per hour)
+    long-term:
+      max-requests: 1000
+      window-seconds: 3600
+    # Strict: Sensitive endpoints like login (5 requests per minute)
+    strict:
+      max-requests: 5
+      window-seconds: 60
+
   # Spring Boot DevTools configuration (automatic restart like nodemon)
   devtools:
     restart:
