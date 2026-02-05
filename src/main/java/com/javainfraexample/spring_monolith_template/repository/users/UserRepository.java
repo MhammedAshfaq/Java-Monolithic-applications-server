@@ -1,4 +1,4 @@
-package com.javainfraexample.spring_monolith_template.repository;
+package com.javainfraexample.spring_monolith_template.repository.users;
 
 import com.javainfraexample.spring_monolith_template.domain.user.User;
 import com.javainfraexample.spring_monolith_template.domain.user.UserStatus;
