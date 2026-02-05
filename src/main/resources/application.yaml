@@ -1,4 +1,6 @@
 spring:
+  main:
+    banner-mode: console
   application:
     name: spring-monolith-template
   # Default to dev so localhost:8082 shows the dev tools dashboard (Swagger, RabbitMQ, Actuator).
@@ -32,6 +34,9 @@ spring:
     baseline-on-migrate: true
     locations: classpath:db/migration
     validate-on-migrate: false
+    # Use timestamp-based migrations: 20260205120000__action_name.sql
+    sql-migration-prefix: ""
+    sql-migration-separator: "__"
 
   data:
     redis:
