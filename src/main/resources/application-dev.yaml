@@ -22,6 +22,11 @@ management:
     health:
       show-details: when-authorized
 
+# Enable debug logging for application code in dev
+logging:
+  level:
+    com.javainfraexample.spring_monolith_template: DEBUG
+
 # Dev dashboard links (used by DevDashboardController)
 app:
   dev-dashboard:

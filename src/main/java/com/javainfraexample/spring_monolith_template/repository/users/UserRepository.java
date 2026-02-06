@@ -31,6 +31,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findByStatus(UserStatus status);
     
     List<User> findByRole(String role);
+
+    Optional<User> findById(UUID id);
     
     // ==================== Custom Queries ====================
     
