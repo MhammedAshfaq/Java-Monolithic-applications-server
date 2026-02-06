@@ -43,6 +43,12 @@ public class DevDashboardController {
     @Value("${app.dev-dashboard.rabbitmq-management-url:http://localhost:15672}")
     private String rabbitmqManagementUrl;
 
+    @Value("${app.dev-dashboard.pgadmin-url:http://localhost:5050}")
+    private String pgadminUrl;
+
+    @Value("${app.dev-dashboard.redis-commander-url:http://localhost:8081}")
+    private String redisCommanderUrl;
+
     @Value("${springdoc.swagger-ui.path:/apidocs}")
     private String swaggerUiPath;
 
@@ -215,6 +221,8 @@ public class DevDashboardController {
             <ul class="grid" role="list">
               <li><a class="card" href="%s">Swagger Dashboard<span class="card-label">API docs · Try it out</span></a></li>
               <li><a class="card external" href="%s" target="_blank" rel="noopener noreferrer">RabbitMQ Dashboard<span class="card-label">Queues · like BullMQ</span></a></li>
+              <li><a class="card external" href="%s" target="_blank" rel="noopener noreferrer">pgAdmin<span class="card-label">PostgreSQL GUI</span></a></li>
+              <li><a class="card external" href="%s" target="_blank" rel="noopener noreferrer">Redis Commander<span class="card-label">Redis GUI · Browse keys</span></a></li>
               <li><a class="card" href="%s">Health<span class="card-label">App health</span></a></li>
               <li><a class="card" href="%s">Database health<span class="card-label">Test DB connection</span></a></li>
               <li><a class="card" href="%s">Redis health<span class="card-label">Test Redis connection</span></a></li>
@@ -246,6 +254,8 @@ public class DevDashboardController {
         String html = TEMPLATE.formatted(
             base + swaggerUiPath,
             rabbitmqManagementUrl,
+            pgadminUrl,
+            redisCommanderUrl,
             base + "/health",
             dbHealthUrl,
             redisHealthUrl,
@@ -309,10 +319,15 @@ public class DevDashboardController {
                 "ping", pong != null ? pong : "PONG"
             ));
         } catch (Exception e) {
+            // Log full stack for debugging
+            e.printStackTrace();
+            Throwable root = e;
+            while (root.getCause() != null) root = root.getCause();
             return ResponseEntity.status(503).body(Map.of(
                 "status", "down",
                 "redis", "disconnected",
-                "error", e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName()
+                "error", e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName(),
+                "rootCause", root.getClass().getName() + ": " + (root.getMessage() != null ? root.getMessage() : "")
             ));
         }
     }

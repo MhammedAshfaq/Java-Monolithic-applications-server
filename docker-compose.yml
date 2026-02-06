@@ -1,0 +1,142 @@
+# ===========================================
+# Docker Compose for Spring Boot Application
+# ===========================================
+#
+# Option 1: Infrastructure only (Java runs locally)
+#   docker-compose up -d postgres redis pgadmin redis-commander
+#   ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+#
+# Option 2: Everything in Docker
+#   docker-compose up -d
+#   Access: http://localhost:8082
+#
+# Commands:
+#   Start all:     docker-compose up -d
+#   Start infra:   docker-compose up -d postgres redis pgadmin redis-commander
+#   Stop:          docker-compose down
+#   Logs:          docker-compose logs -f [service_name]
+#   Rebuild app:   docker-compose up -d --build app
+# ===========================================
+
+services:
+  # ==================== Spring Boot Application ====================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-app
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker,dev
+      # Database connection (uses ${DB_HOST:localhost} in application.yaml)
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: java-spring-mololithic
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      # Redis connection (uses ${REDIS_HOST:localhost} in application.yaml)
+      # Note: application-docker.yaml also sets host: redis explicitly
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: yourStrongPassword123
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - spring-network
+    # Uncomment to enable hot-reload with local source (development)
+    # volumes:
+    #   - ./target:/app/target:ro
+  # ==================== PostgreSQL ====================
+  postgres:
+    image: postgres:16-alpine
+    container_name: spring-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: java-spring-mololithic
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - spring-network
+
+  # ==================== pgAdmin (PostgreSQL GUI) ====================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: spring-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - spring-network
+
+  # ==================== Redis ====================
+  redis:
+    image: redis:7-alpine
+    container_name: spring-redis
+    restart: unless-stopped
+    command: redis-server --requirepass yourStrongPassword123
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "yourStrongPassword123", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - spring-network
+
+  # ==================== Redis Commander (Redis GUI) ====================
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: spring-redis-commander
+    restart: unless-stopped
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: yourStrongPassword123
+      HTTP_USER: admin
+      HTTP_PASSWORD: admin
+    ports:
+      - "8081:8081"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - spring-network
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  spring-network:
+    driver: bridge

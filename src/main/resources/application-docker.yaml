@@ -1,0 +1,35 @@
+# ===========================================
+# Docker Profile Configuration
+# ===========================================
+# Activate with: --spring.profiles.active=docker,dev
+# 
+# When running inside Docker, services are accessed
+# by their container names (not localhost):
+#   - postgres (not localhost:5432)
+#   - redis (not localhost:6379)
+# ===========================================
+
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  # Database: Connect to PostgreSQL container by service name
+  datasource:
+    url: jdbc:postgresql://postgres:5432/${DB_NAME:java-spring-mololithic}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+
+  # Redis: Connect to Redis container by service name
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: ${REDIS_PASSWORD:yourStrongPassword123}
+
+# Dev dashboard links - use host.docker.internal for external tools
+app:
+  dev-dashboard:
+    rabbitmq-management-url: http://host.docker.internal:15672
+    pgadmin-url: http://host.docker.internal:5050
+    redis-commander-url: http://host.docker.internal:8081

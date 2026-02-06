@@ -1,0 +1,48 @@
+# Docker ignore file
+# Reduces build context size for faster builds
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+*.iml
+.vscode
+.cursor
+
+# Build output (we build inside Docker)
+target/
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Docker files (not needed in context)
+docker-compose*.yml
+Dockerfile*
+
+# Scripts
+scripts/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+*.test.java
+
+# Temporary files
+*.tmp
+*.temp
+*.swp

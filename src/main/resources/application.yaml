@@ -1,17 +1,42 @@
+# ===========================================
+# Spring Boot Application Configuration
+# ===========================================
+#
+# PROFILES:
+#   dev     - Local development (connects to localhost)
+#   docker  - Docker environment (connects to container names)
+#   prod    - Production settings
+#
+# LOCAL DEVELOPMENT (Java runs locally, infra in Docker):
+#   docker-compose up -d postgres redis pgadmin redis-commander
+#   ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+#   Connects to: localhost:5432, localhost:6379
+#
+# FULL DOCKER (Everything in Docker):
+#   docker-compose up -d
+#   Uses profile: docker,dev
+#   Connects to: postgres:5432, redis:6379 (container names)
+#
+# ===========================================
+
 spring:
   main:
     banner-mode: console
   application:
     name: spring-monolith-template
-  # Default to dev so localhost:8082 shows the dev tools dashboard (Swagger, RabbitMQ, Actuator).
-  # Override in prod: --spring.profiles.active=prod or SPRING_PROFILES_ACTIVE=prod
+  # Default to dev so localhost:8082 shows the dev tools dashboard.
+  # For Docker: SPRING_PROFILES_ACTIVE=docker,dev
+  # For Prod:   SPRING_PROFILES_ACTIVE=prod
   profiles:
     active: dev
 
+  # Database configuration
+  # Override with environment variables:
+  #   DB_HOST=localhost DB_PORT=5432 DB_NAME=mydb DB_USER=user DB_PASSWORD=pass
   datasource:
-    url: jdbc:postgresql://localhost:5432/java-spring-mololithic
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:java-spring-mololithic}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
     hikari:
@@ -38,11 +63,14 @@ spring:
     sql-migration-prefix: ""
     sql-migration-separator: "__"
 
+  # Redis configuration
+  # Override with environment variables:
+  #   REDIS_HOST=localhost REDIS_PORT=6379 REDIS_PASSWORD=yourpass
   data:
     redis:
-      host: localhost
-      port: 6379
-      password: yourStrongPassword123
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:yourStrongPassword123}
       timeout: 3000ms
 
 # Rate limiting configuration

@@ -5,11 +5,9 @@ spring:
   config:
     activate:
       on-profile: dev
-  data:
-    redis:
-      # Redis with password. URL form ensures auth is applied (same as redis-cli AUTH yourStrongPassword123).
-      # Override: SPRING_DATA_REDIS_URL=redis://:yourStrongPassword123@localhost:6379
-      url: redis://:yourStrongPassword123@localhost:6379
+  # Redis config is in application.yaml (uses ${REDIS_HOST:localhost})
+  # For Docker, application-docker.yaml overrides with host: redis
+  # DO NOT set spring.data.redis.url here - it overrides host/port/password
 
 # Actuator: expose useful endpoints for dev (do NOT expose all in prod)
 management:
@@ -32,5 +30,7 @@ app:
   dev-dashboard:
     # RabbitMQ Management UI (default: local Docker/host)
     rabbitmq-management-url: http://localhost:15672
-    # Optional: H2 console base URL if you use H2 in dev
-    # h2-console-url: http://localhost:8082/h2-console
+    # pgAdmin - PostgreSQL GUI (Docker: docker-compose up -d)
+    pgadmin-url: http://localhost:5050
+    # Redis Commander - Redis GUI (Docker: docker-compose up -d)
+    redis-commander-url: http://localhost:8081
