@@ -35,16 +35,22 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       # Redis connection (uses ${REDIS_HOST:localhost} in application.yaml)
-      # Note: application-docker.yaml also sets host: redis explicitly
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: yourStrongPassword123
+      # RabbitMQ connection
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
     ports:
       - "8082:8082"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     networks:
       - spring-network
@@ -129,12 +135,36 @@ services:
     networks:
       - spring-network
 
+  # ==================== RabbitMQ (Message Broker) ====================
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: spring-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - "5672:5672"    # AMQP port
+      - "15672:15672"  # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - spring-network
+
 volumes:
   postgres_data:
     driver: local
   pgadmin_data:
     driver: local
   redis_data:
+    driver: local
+  rabbitmq_data:
     driver: local
 
 networks:

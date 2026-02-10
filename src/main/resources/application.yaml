@@ -63,6 +63,34 @@ spring:
     sql-migration-prefix: ""
     sql-migration-separator: "__"
 
+  # Quartz Scheduler configuration (DB-backed, production-ready)
+  # Quartz stores jobs in PostgreSQL so they survive restarts and support clustering.
+  # Spring Boot auto-configures the DataSource and jobStore class — do NOT set them manually.
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      # "never" = Flyway manages the Quartz tables (see migration 20260209180000)
+      initialize-schema: never
+    # Replace existing jobs on startup (avoids stale/corrupt job data conflicts)
+    overwrite-existing-jobs: true
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: spring-scheduler
+            instanceId: AUTO
+          jobStore:
+            # Do NOT set 'class' here — Spring Boot handles that.
+            # But driverDelegateClass MUST be set for PostgreSQL (BYTEA vs BLOB handling).
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+            tablePrefix: QRTZ_
+            isClustered: true
+            clusterCheckinInterval: 15000
+            misfireThreshold: 60000
+          threadPool:
+            threadCount: 5
+            threadPriority: 5
+
   # Redis configuration
   # Override with environment variables:
   #   REDIS_HOST=localhost REDIS_PORT=6379 REDIS_PASSWORD=yourpass
