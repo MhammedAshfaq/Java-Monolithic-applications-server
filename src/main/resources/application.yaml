@@ -101,6 +101,17 @@ spring:
       password: ${REDIS_PASSWORD:yourStrongPassword123}
       timeout: 3000ms
 
+  # Multipart (file upload) configuration
+  # max-file-size:    Max size of a single uploaded file (default: 1MB).
+  #                   Requests with a file exceeding this limit get a MaxUploadSizeExceededException.
+  # max-request-size: Max size of the entire multipart request, including all files + form fields (default: 10MB).
+  #                   Protects against excessively large payloads consuming server memory/bandwidth.
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 50MB
+
 # Rate limiting configuration
 app:
   rate-limit:
@@ -139,6 +150,16 @@ app:
 server:
   address: 0.0.0.0
   port: 8082
+  # max-http-header-size: Max allowed size of HTTP request headers (default: 8KB).
+  #                      Increase if using large cookies, JWT tokens, or many custom headers.
+  #                      Prevents oversized header attacks (HTTP 431 if exceeded).
+  max-http-header-size: 16KB
+  tomcat:
+    # max-swallow-size: Max request body Tomcat will "swallow" (read & discard) after rejecting a request (default: 2MB).
+    #                   When a client sends a body larger than allowed but Tomcat has already decided to reject it,
+    #                   Tomcat reads up to this amount so the client receives a proper error response
+    #                   instead of a broken pipe / connection reset.
+    max-swallow-size: 20MB
 
 # Swagger/OpenAPI configuration
 springdoc:
