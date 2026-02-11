@@ -9,16 +9,18 @@ spring:
   # For Docker, application-docker.yaml overrides with host: redis
   # DO NOT set spring.data.redis.url here - it overrides host/port/password
 
-# Actuator: expose useful endpoints for dev (do NOT expose all in prod)
+# Actuator: expose extra endpoints for dev (base config in application.yaml)
+# Dev adds: metrics, env, caches, scheduledtasks on top of health, info, prometheus
 management:
   endpoints:
     web:
-      base-path: /actuator
       exposure:
-        include: health,info,metrics,env
+        include: health,info,prometheus,metrics,env,caches,scheduledtasks
   endpoint:
     health:
-      show-details: when-authorized
+      # In dev, always show full health details (db, redis, diskSpace, etc.)
+      show-details: always
+      show-components: always
 
 # Enable debug logging for application code in dev
 logging:
@@ -34,3 +36,7 @@ app:
     pgadmin-url: http://localhost:5050
     # Redis Commander - Redis GUI (Docker: docker-compose up -d)
     redis-commander-url: http://localhost:8081
+    # Prometheus - Metrics collection & querying
+    prometheus-url: http://localhost:9090
+    # Grafana - Metrics visualization & dashboards (admin/admin)
+    grafana-url: http://localhost:3000

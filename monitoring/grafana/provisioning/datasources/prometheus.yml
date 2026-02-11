@@ -1,0 +1,22 @@
+# ===========================================
+# Grafana Datasource Provisioning
+# ===========================================
+# Auto-configures Prometheus as the default datasource on first boot.
+# No manual setup needed — Grafana connects to Prometheus immediately.
+# ===========================================
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    # Use Docker container name (Grafana and Prometheus are on the same network)
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      # Time interval matching Prometheus scrape_interval
+      timeInterval: '15s'
+      # Enable exemplars for trace correlation (future-proof)
+      httpMethod: POST

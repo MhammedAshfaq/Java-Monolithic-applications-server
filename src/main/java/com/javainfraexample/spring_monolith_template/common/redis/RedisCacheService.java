@@ -3,7 +3,9 @@ package com.javainfraexample.spring_monolith_template.common.redis;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.RequiredArgsConstructor;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -43,11 +45,40 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class RedisCacheService {
 
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
+
+    // Micrometer counters — visible in Grafana as redis_cache_hits_total, etc.
+    private final Counter cacheHits;
+    private final Counter cacheMisses;
+    private final Counter cachePuts;
+    private final Counter cacheDeletes;
+
+    public RedisCacheService(StringRedisTemplate redisTemplate,
+                             ObjectMapper objectMapper,
+                             MeterRegistry meterRegistry) {
+        this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
+
+        this.cacheHits = Counter.builder("redis.cache.hits")
+                .description("Number of Redis cache hits")
+                .tag("cache", "redis-manual")
+                .register(meterRegistry);
+        this.cacheMisses = Counter.builder("redis.cache.misses")
+                .description("Number of Redis cache misses")
+                .tag("cache", "redis-manual")
+                .register(meterRegistry);
+        this.cachePuts = Counter.builder("redis.cache.puts")
+                .description("Number of Redis cache puts/sets")
+                .tag("cache", "redis-manual")
+                .register(meterRegistry);
+        this.cacheDeletes = Counter.builder("redis.cache.deletes")
+                .description("Number of Redis cache deletes")
+                .tag("cache", "redis-manual")
+                .register(meterRegistry);
+    }
 
     // ==================== String Operations ====================
 
@@ -57,6 +88,7 @@ public class RedisCacheService {
     public void set(String key, String value) {
         try {
             redisTemplate.opsForValue().set(key, value);
+            cachePuts.increment();
             log.debug("Redis SET: {}", key);
         } catch (Exception e) {
             log.error("Redis SET failed for key: {}", key, e);
@@ -69,6 +101,7 @@ public class RedisCacheService {
     public void set(String key, String value, Duration ttl) {
         try {
             redisTemplate.opsForValue().set(key, value, ttl);
+            cachePuts.increment();
             log.debug("Redis SET: {} (TTL: {})", key, ttl);
         } catch (Exception e) {
             log.error("Redis SET failed for key: {}", key, e);
@@ -88,6 +121,11 @@ public class RedisCacheService {
     public Optional<String> get(String key) {
         try {
             String value = redisTemplate.opsForValue().get(key);
+            if (value != null) {
+                cacheHits.increment();
+            } else {
+                cacheMisses.increment();
+            }
             log.debug("Redis GET: {} -> {}", key, value != null ? "HIT" : "MISS");
             return Optional.ofNullable(value);
         } catch (Exception e) {
@@ -109,6 +147,9 @@ public class RedisCacheService {
     public boolean delete(String key) {
         try {
             Boolean result = redisTemplate.delete(key);
+            if (Boolean.TRUE.equals(result)) {
+                cacheDeletes.increment();
+            }
             log.debug("Redis DELETE: {} -> {}", key, result);
             return Boolean.TRUE.equals(result);
         } catch (Exception e) {
@@ -123,6 +164,9 @@ public class RedisCacheService {
     public long delete(Collection<String> keys) {
         try {
             Long count = redisTemplate.delete(keys);
+            if (count != null && count > 0) {
+                cacheDeletes.increment(count);
+            }
             log.debug("Redis DELETE: {} keys -> {} deleted", keys.size(), count);
             return count != null ? count : 0;
         } catch (Exception e) {

@@ -29,6 +29,7 @@ open http://localhost:8082/apidocs  # Swagger
 | [Database & Migrations](database/README.md) | Entities, repositories, Flyway migrations |
 | [API Development](api/README.md) | Controllers, DTOs, validation, Swagger |
 | [Rate Limiting](rate-limit/README.md) | IP-based rate limiting with Redis |
+| [Monitoring](monitoring/README.md) | Prometheus + Grafana setup, metrics, dashboards |
 | [Dev Tools](dev-tools/README.md) | Developer dashboard, health checks |
 | [Deployment](deployment/README.md) | Production config, Docker, security |
 
@@ -112,8 +113,11 @@ spring-monolith-template/
 | http://localhost:8082/apidocs | Swagger UI |
 | http://localhost:8082/api/health | Health Check |
 | http://localhost:8082/actuator | Actuator |
+| http://localhost:8082/actuator/prometheus | Raw Prometheus Metrics |
 | http://localhost:8082/dev/db-health | Database Health |
 | http://localhost:8082/dev/redis-health | Redis Health |
+| http://localhost:3000 | Grafana (admin/admin) |
+| http://localhost:9090 | Prometheus UI |
 
 ---
 
@@ -128,6 +132,8 @@ spring-monolith-template/
 | ORM | JPA / Hibernate |
 | Connection Pool | HikariCP |
 | Migrations | Flyway |
+| Metrics | Micrometer + Prometheus |
+| Dashboards | Grafana |
 | API Docs | SpringDoc OpenAPI |
 | Build | Maven |
 

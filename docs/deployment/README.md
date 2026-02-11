@@ -306,28 +306,22 @@ logging:
 
 ## Monitoring
 
-### Expose Metrics (Optional)
+Prometheus + Grafana monitoring is fully configured. See the dedicated documentation:
 
-```yaml
-# application-prod.yaml
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,metrics,prometheus
+**[Monitoring (Prometheus + Grafana)](../monitoring/README.md)**
+
+Quick summary:
+
+| Service | URL | Purpose |
+|---------|-----|---------|
+| Grafana | http://localhost:3000 | Dashboards & visualization (admin/admin) |
+| Prometheus | http://localhost:9090 | Metrics collection & PromQL queries |
+| Raw Metrics | http://localhost:8082/actuator/prometheus | Micrometer metrics endpoint |
+
+```bash
+# Start monitoring
+docker-compose up -d prometheus grafana
 ```
-
-### Prometheus Integration
-
-Add dependency:
-```xml
-<dependency>
-    <groupId>io.micrometer</groupId>
-    <artifactId>micrometer-registry-prometheus</artifactId>
-</dependency>
-```
-
-Metrics available at: `/actuator/prometheus`
 
 ---
 

@@ -135,6 +135,66 @@ services:
     networks:
       - spring-network
 
+  # ==================== Prometheus (Metrics Collection) ====================
+  # Scrapes /actuator/prometheus every 15s and stores time-series data.
+  # UI: http://localhost:9090
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: spring-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      # Enable hot-reload of config (POST /-/reload)
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      # Retain metrics for 15 days (production-grade retention)
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - spring-network
+
+  # ==================== Grafana (Metrics Visualization) ====================
+  # Pre-configured with Prometheus datasource + Spring Boot dashboard.
+  # UI: http://localhost:3000  (admin / admin)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: spring-grafana
+    restart: unless-stopped
+    environment:
+      # Default admin credentials (change in production)
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      # Allow embedding in iframes (useful for dev dashboard)
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      # Skip initial password change prompt in dev
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - spring-network
+
   # ==================== RabbitMQ (Message Broker) ====================
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -165,6 +225,10 @@ volumes:
   redis_data:
     driver: local
   rabbitmq_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
     driver: local
 
 networks:
