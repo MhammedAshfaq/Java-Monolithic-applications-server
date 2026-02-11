@@ -177,15 +177,14 @@ src/main/resources/db/
 
 ### Run Seed Data
 
-**List available seeds:**
+#### Option 1: Local Development (Java runs locally, PostgreSQL in Docker)
+
+Requires `psql` on your machine. Install with: `brew install libpq && brew link --force libpq`
 
 ```bash
+# List available seeds
 ./scripts/run-seed.sh
-```
 
-**Run specific seed:**
-
-```bash
 # Seed users only
 ./scripts/run-seed.sh users
 
@@ -194,6 +193,43 @@ src/main/resources/db/
 
 # Seed all data
 ./scripts/run-seed.sh all
+```
+
+#### Option 2: Docker Container (no psql needed on host)
+
+When everything runs in Docker, exec into the PostgreSQL container directly:
+
+```bash
+# Seed all data (users + refresh tokens)
+docker exec -i spring-postgres psql -U postgres -d java-spring-mololithic < src/main/resources/db/seed/users.sql
+docker exec -i spring-postgres psql -U postgres -d java-spring-mololithic < src/main/resources/db/seed/refresh_tokens.sql
+
+# Seed users only
+docker exec -i spring-postgres psql -U postgres -d java-spring-mololithic < src/main/resources/db/seed/users.sql
+
+# Seed refresh tokens only
+docker exec -i spring-postgres psql -U postgres -d java-spring-mololithic < src/main/resources/db/seed/refresh_tokens.sql
+```
+
+**Alternative: Copy files into container first**
+
+```bash
+# Copy seed files into the container
+docker cp src/main/resources/db/seed/. spring-postgres:/tmp/seed/
+
+# Run seeds inside the container
+docker exec spring-postgres psql -U postgres -d java-spring-mololithic -f /tmp/seed/users.sql
+docker exec spring-postgres psql -U postgres -d java-spring-mololithic -f /tmp/seed/refresh_tokens.sql
+```
+
+#### Verify seed data
+
+```bash
+# Local psql
+psql -U postgres -d java-spring-mololithic -c "SELECT id, email, role, status FROM users;"
+
+# Or via Docker
+docker exec spring-postgres psql -U postgres -d java-spring-mololithic -c "SELECT id, email, role, status FROM users;"
 ```
 
 ### Test Credentials
@@ -270,15 +306,34 @@ DB_NAME=my_database ./scripts/run-seed.sh all
 
 ### Workflow
 
+**Local development (Java runs locally):**
+
 ```bash
-# 1. Start app (runs migrations)
+# 1. Start infrastructure
+docker-compose up -d postgres redis pgadmin redis-commander
+
+# 2. Start app (migrations run automatically on startup)
 ./mvnw spring-boot:run
 
-# 2. Seed data (in another terminal)
+# 3. Seed data (in another terminal)
 ./scripts/run-seed.sh all
 
+# 4. Verify
+psql -U postgres -d java-spring-mololithic -c "SELECT id, email, role, status FROM users;"
+```
+
+**Full Docker (everything in Docker):**
+
+```bash
+# 1. Start all services (migrations run automatically on app startup)
+docker-compose up -d
+
+# 2. Seed data (in another terminal)
+docker exec -i spring-postgres psql -U postgres -d java-spring-mololithic < src/main/resources/db/seed/users.sql
+docker exec -i spring-postgres psql -U postgres -d java-spring-mololithic < src/main/resources/db/seed/refresh_tokens.sql
+
 # 3. Verify
-psql -U postgres -d java-spring-mololithic -c "SELECT id, email, role FROM users;"
+docker exec spring-postgres psql -U postgres -d java-spring-mololithic -c "SELECT id, email, role, status FROM users;"
 ```
 
 ---

@@ -33,3 +33,5 @@ app:
     rabbitmq-management-url: http://host.docker.internal:15672
     pgadmin-url: http://host.docker.internal:5050
     redis-commander-url: http://host.docker.internal:8081
+    prometheus-url: http://host.docker.internal:9090
+    grafana-url: http://host.docker.internal:3000

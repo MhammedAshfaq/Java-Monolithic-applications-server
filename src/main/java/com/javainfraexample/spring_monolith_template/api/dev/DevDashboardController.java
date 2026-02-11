@@ -52,6 +52,12 @@ public class DevDashboardController {
     @Value("${springdoc.swagger-ui.path:/apidocs}")
     private String swaggerUiPath;
 
+    @Value("${app.dev-dashboard.prometheus-url:http://localhost:9090}")
+    private String prometheusUrl;
+
+    @Value("${app.dev-dashboard.grafana-url:http://localhost:3000}")
+    private String grafanaUrl;
+
     private static final String TEMPLATE = """
         <!DOCTYPE html>
         <html lang="en">
@@ -227,12 +233,15 @@ public class DevDashboardController {
               <li><a class="card" href="%s">Database health<span class="card-label">Test DB connection</span></a></li>
               <li><a class="card" href="%s">Redis health<span class="card-label">Test Redis connection</span></a></li>
               <li><a class="card" href="%s">Actuator<span class="card-label">JSON index · _links</span></a></li>
+              <li><a class="card external" href="%s" target="_blank" rel="noopener noreferrer">Grafana<span class="card-label">Dashboards · Metrics viz</span></a></li>
+              <li><a class="card external" href="%s" target="_blank" rel="noopener noreferrer">Prometheus<span class="card-label">Metrics query · PromQL</span></a></li>
             </ul>
             <section class="section" aria-label="Actuator endpoints">
               <h2 class="section-title">Actuator (JSON)</h2>
               <div class="pills">
                 <a href="%s">health</a>
                 <a href="%s">info</a>
+                <a href="%s">prometheus</a>
                 <a href="%s">metrics</a>
                 <a href="%s">env</a>
               </div>
@@ -260,8 +269,11 @@ public class DevDashboardController {
             dbHealthUrl,
             redisHealthUrl,
             actuatorBase,
+            grafanaUrl,
+            prometheusUrl,
             actuatorBase + "/health",
             actuatorBase + "/info",
+            actuatorBase + "/prometheus",
             actuatorBase + "/metrics",
             actuatorBase + "/env"
         );

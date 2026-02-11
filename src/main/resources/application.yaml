@@ -161,6 +161,46 @@ server:
     #                   instead of a broken pipe / connection reset.
     max-swallow-size: 20MB
 
+# ===========================================
+# Monitoring & Metrics (Micrometer + Prometheus)
+# ===========================================
+# Micrometer collects JVM, HTTP, DB, cache metrics automatically.
+# Prometheus scrapes /actuator/prometheus every 15s.
+# Grafana visualizes the data at http://localhost:3000.
+#
+# Architecture:
+#   App -> Micrometer -> /actuator/prometheus -> Prometheus (scrape) -> Grafana (visualize)
+# ===========================================
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        # Prometheus endpoint is always exposed (secured by network/firewall in prod, not auth)
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+      # Show individual component health (db, redis, diskSpace, etc.)
+      show-components: when-authorized
+    prometheus:
+      enabled: true
+  # Metrics configuration
+  metrics:
+    tags:
+      # Add "application" tag to all metrics for multi-app Grafana dashboards
+      application: ${spring.application.name}
+    distribution:
+      # Record percentile histograms for HTTP request durations (p50, p95, p99)
+      percentiles-histogram:
+        http.server.requests: true
+      # Also record explicit percentile values
+      percentiles:
+        http.server.requests: 0.5, 0.95, 0.99
+      # SLA boundaries — counts requests under these thresholds (useful for SLO tracking)
+      slo:
+        http.server.requests: 50ms, 100ms, 200ms, 500ms, 1s, 5s
+
 # Swagger/OpenAPI configuration
 springdoc:
   api-docs:

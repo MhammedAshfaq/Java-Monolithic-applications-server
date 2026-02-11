@@ -1,0 +1,22 @@
+# ===========================================
+# Grafana Dashboard Provisioning
+# ===========================================
+# Auto-loads dashboard JSON files from the specified folder on startup.
+# Add .json dashboard files to /monitoring/grafana/dashboards/ and they
+# will appear in Grafana automatically.
+# ===========================================
+
+apiVersion: 1
+
+providers:
+  - name: 'Spring Boot Dashboards'
+    orgId: 1
+    folder: 'Spring Boot'
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/json
+      foldersFromFilesStructure: false
