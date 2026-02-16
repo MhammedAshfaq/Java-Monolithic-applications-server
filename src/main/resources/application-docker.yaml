@@ -27,6 +27,13 @@ spring:
       port: 6379
       password: ${REDIS_PASSWORD:yourStrongPassword123}
 
+  # RabbitMQ: Connect to RabbitMQ container by service name
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
 # Dev dashboard links - use host.docker.internal for external tools
 app:
   dev-dashboard:

@@ -171,7 +171,14 @@ spring-monolith-template/
 │   │   │       │   └── health/             # Health check endpoints
 │   │   │       ├── config/                 # Configuration classes
 │   │   │       │   ├── security/           # Security configuration
-│   │   │       │   └── swagger/            # Swagger/OpenAPI configuration
+│   │   │       │   ├── swagger/            # Swagger/OpenAPI configuration
+│   │   │       │   └── rabbitmq/           # Shared RabbitMQ infra (exchanges, converter)
+│   │   │       ├── messaging/              # RabbitMQ messaging (domain-driven)
+│   │   │       │   ├── constant/           # Queue/exchange/routing key names
+│   │   │       │   ├── email/             # Email: QueueConfig, Publisher, Listener, Message
+│   │   │       │   ├── notification/      # Notification: QueueConfig, Publisher, Listener, Message
+│   │   │       │   ├── audit/             # Audit: QueueConfig, Publisher, Listener, Message
+│   │   │       │   └── task/              # Task: QueueConfig, Publisher, Listener, Message
 │   │   │       └── SpringMonolithTemplateApplication.java
 │   │   └── resources/
 │   │       ├── application.yaml            # Main configuration

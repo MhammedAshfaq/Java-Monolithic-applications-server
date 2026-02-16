@@ -1,0 +1,32 @@
+package com.javainfraexample.spring_monolith_template.messaging.notification.listener;
+
+import com.javainfraexample.spring_monolith_template.messaging.constant.QueueConstants;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+/**
+ * Consumes single notification messages — delivers to one specific token.
+ *
+ * <p>Retry: Spring auto-retry (3 attempts, exponential backoff) → DLQ on exhaustion.</p>
+ * <p>Queue: {@code app.notification.single}</p>
+ * <p>DLQ: {@code app.notification.single.dlq}</p>
+ */
+@Slf4j
+@Component
+public class SingleNotificationListener {
+
+    // TODO: Inject your notification service here
+    // private final NotificationService notificationService;
+
+    @RabbitListener(queues = QueueConstants.NOTIFICATION_SINGLE_QUEUE)
+    public void onMessage(String payload) {
+        log.info("Single notification received: {}", payload);
+
+        // TODO: Deserialize and deliver
+        // NotificationMessage notif = objectMapper.readValue(payload, NotificationMessage.class);
+        // notificationService.sendToToken(notif.token(), notif.title(), notif.body(), notif.priority(), notif.data());
+    }
+}

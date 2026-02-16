@@ -31,6 +31,7 @@ open http://localhost:8082/apidocs  # Swagger
 | [Rate Limiting](rate-limit/README.md) | IP-based rate limiting with Redis |
 | [Monitoring](monitoring/README.md) | Prometheus + Grafana setup, metrics, dashboards |
 | [Dev Tools](dev-tools/README.md) | Developer dashboard, health checks |
+| [RabbitMQ Messaging](rabbitmq/README.md) | Queues, publishers, listeners, DLQ |
 | [Deployment](deployment/README.md) | Production config, Docker, security |
 
 ---
@@ -89,7 +90,14 @@ spring-monolith-template/
 │   ├── domain/             # Entities + Enums
 │   ├── repository/         # Data Access (JPA)
 │   ├── common/             # Shared (DTOs, Rate Limit)
-│   └── config/             # Configuration
+│   ├── config/             # Configuration
+│   │   └── rabbitmq/       # Shared RabbitMQ infra (exchanges, converter)
+│   └── messaging/          # RabbitMQ Messaging (domain-driven)
+│       ├── constant/       # QueueConstants (all queue/routing key names)
+│       ├── email/          # EmailQueueConfig, EmailPublisher, EmailListener, EmailMessage
+│       ├── notification/   # NotificationQueueConfig, Publisher, Listener, Message
+│       ├── audit/          # AuditQueueConfig, Publisher, Listener, Message
+│       └── task/           # TaskQueueConfig, Publisher, Listener, Message
 │
 ├── src/main/resources/
 │   ├── application.yaml
@@ -134,6 +142,7 @@ spring-monolith-template/
 | Migrations | Flyway |
 | Metrics | Micrometer + Prometheus |
 | Dashboards | Grafana |
+| Messaging | RabbitMQ (AMQP) |
 | API Docs | SpringDoc OpenAPI |
 | Build | Maven |
 

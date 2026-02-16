@@ -101,6 +101,38 @@ spring:
       password: ${REDIS_PASSWORD:yourStrongPassword123}
       timeout: 3000ms
 
+  # RabbitMQ configuration
+  # Override with environment variables:
+  #   RABBITMQ_HOST=localhost RABBITMQ_PORT=5672 RABBITMQ_USER=guest RABBITMQ_PASSWORD=guest
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    virtual-host: /
+    # Connection settings
+    connection-timeout: 10000
+    # Publisher confirms — ensures messages reach the broker (production-critical)
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    # Consumer settings
+    listener:
+      simple:
+        # Auto ACK — Spring manages ACK/NACK automatically
+        acknowledge-mode: auto
+        # Prefetch: how many messages to fetch at once (1 = fair dispatch)
+        prefetch: 1
+        # Start with 1 consumer, scale up to 3 under load
+        concurrency: 1
+        max-concurrency: 3
+        # Retry: 3 attempts with exponential backoff, then send to DLQ
+        retry:
+          enabled: true
+          initial-interval: 1000    # 1st retry delay: 1s
+          max-interval: 10000      # Max delay cap: 10s
+          multiplier: 2.0           # Backoff: 1s → 2s → 4s
+          max-attempts: 3           # Total attempts before DLQ
+
   # Multipart (file upload) configuration
   # max-file-size:    Max size of a single uploaded file (default: 1MB).
   #                   Requests with a file exceeding this limit get a MaxUploadSizeExceededException.
@@ -114,6 +146,12 @@ spring:
 
 # Rate limiting configuration
 app:
+  # DLQ alert configuration — sends Slack notification when messages fail all retries
+  dlq:
+    slack:
+      enabled: false
+      webhook-url: ${DLQ_SLACK_WEBHOOK_URL:}  # Set via env: DLQ_SLACK_WEBHOOK_URL=https://hooks.slack.com/services/XXX/YYY/ZZZ
+
   rate-limit:
     enabled: true
     # Short-term: Burst protection (100 requests per minute)
