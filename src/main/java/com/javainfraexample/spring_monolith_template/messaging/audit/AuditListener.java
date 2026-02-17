@@ -22,11 +22,12 @@ public class AuditListener {
     // private final AuditService auditService;
 
     @RabbitListener(queues = QueueConstants.AUDIT_QUEUE)
-    public void onMessage(String payload) {
-        log.info("Audit event received: {}", payload);
+    public void onMessage(AuditMessage event) {
+        log.info("[AUDIT QUEUE] Event received: action={}, userId={}", event.action(), event.userId());
 
-        // TODO: Deserialize and persist
-        // AuditMessage event = objectMapper.readValue(payload, AuditMessage.class);
+        // TODO: Delegate to audit service
         // auditService.record(event);
+
+        log.info("[AUDIT QUEUE] Processed successfully: action={}", event.action());
     }
 }

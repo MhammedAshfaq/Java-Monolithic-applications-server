@@ -1,6 +1,7 @@
 package com.javainfraexample.spring_monolith_template.messaging.notification.listener;
 
 import com.javainfraexample.spring_monolith_template.messaging.constant.QueueConstants;
+import com.javainfraexample.spring_monolith_template.messaging.notification.message.NotificationMessage;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,15 +19,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class TopicNotificationListener {
 
-    // TODO: Inject your services here
+    // TODO: Inject your notification service here
     // private final NotificationService notificationService;
 
     @RabbitListener(queues = QueueConstants.NOTIFICATION_TOPIC_QUEUE)
-    public void onMessage(String payload) {
-        log.info("Topic notification received: {}", payload);
+    public void onMessage(NotificationMessage message) {
+        log.info("[NOTIFICATION TOPIC] Received: topic={}, title={}, priority={}",
+                message.topic(), message.title(), message.priority());
 
-        // TODO: Deserialize and broadcast to topic subscribers
-        // NotificationMessage notif = objectMapper.readValue(payload, NotificationMessage.class);
-        // notificationService.sendToTopic(notif.topic(), notif.title(), notif.body(), notif.priority(), notif.data());
+        // TODO: Delegate to notification service
+        // notificationService.sendToTopic(message.topic(), message.title(), message.body(), message.priority(), message.data());
+
+        log.info("[NOTIFICATION TOPIC] Processed successfully for topic: {}", message.topic());
     }
 }

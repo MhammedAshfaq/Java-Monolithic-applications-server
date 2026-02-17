@@ -7,14 +7,19 @@ import com.javainfraexample.spring_monolith_template.api.auth.dto.LoginResponse;
 import com.javainfraexample.spring_monolith_template.api.auth.dto.RefreshTokenRequest;
 import com.javainfraexample.spring_monolith_template.api.auth.dto.RegisterRequest;
 import com.javainfraexample.spring_monolith_template.common.dto.ApiResponseDto;
+import com.javainfraexample.spring_monolith_template.messaging.email.publisher.EmailPublisher;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+
+    private final EmailPublisher emailPublisher;
 
     // TODO: Inject UserRepository, PasswordEncoder, JwtService
     
@@ -31,6 +36,7 @@ public class AuthService {
             "refresh_token_placeholder", 
             3600L // 1 hour
         );
+        emailPublisher.sendLogin(request.email(), "Muhammed", Map.of());
         
         return ApiResponseDto.success("Login successful", response);
     }

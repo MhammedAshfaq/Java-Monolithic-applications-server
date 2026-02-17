@@ -1,6 +1,7 @@
 package com.javainfraexample.spring_monolith_template.messaging.notification.listener;
 
 import com.javainfraexample.spring_monolith_template.messaging.constant.QueueConstants;
+import com.javainfraexample.spring_monolith_template.messaging.notification.message.NotificationMessage;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,11 +23,14 @@ public class MulticastNotificationListener {
     // private final NotificationService notificationService;
 
     @RabbitListener(queues = QueueConstants.NOTIFICATION_MULTICAST_QUEUE)
-    public void onMessage(String payload) {
-        log.info("Multicast notification received: {}", payload);
+    public void onMessage(NotificationMessage message) {
+        log.info("[NOTIFICATION MULTICAST] Received: tokens={}, title={}, priority={}",
+                message.tokens() != null ? message.tokens().size() : 0, message.title(), message.priority());
 
-        // TODO: Deserialize and fan out to each token
-        // NotificationMessage notif = objectMapper.readValue(payload, NotificationMessage.class);
-        // notificationService.sendToTokens(notif.tokens(), notif.title(), notif.body(), notif.priority(), notif.data());
+        // TODO: Delegate to notification service
+        // notificationService.sendToTokens(message.tokens(), message.title(), message.body(), message.priority(), message.data());
+
+        log.info("[NOTIFICATION MULTICAST] Processed successfully for {} tokens",
+                message.tokens() != null ? message.tokens().size() : 0);
     }
 }

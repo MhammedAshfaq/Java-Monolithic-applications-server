@@ -1,6 +1,7 @@
 package com.javainfraexample.spring_monolith_template.messaging.notification.listener;
 
 import com.javainfraexample.spring_monolith_template.messaging.constant.QueueConstants;
+import com.javainfraexample.spring_monolith_template.messaging.notification.message.NotificationMessage;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,11 +23,13 @@ public class SingleNotificationListener {
     // private final NotificationService notificationService;
 
     @RabbitListener(queues = QueueConstants.NOTIFICATION_SINGLE_QUEUE)
-    public void onMessage(String payload) {
-        log.info("Single notification received: {}", payload);
+    public void onMessage(NotificationMessage message) {
+        log.info("[NOTIFICATION SINGLE] Received: token={}, title={}, priority={}",
+                message.token(), message.title(), message.priority());
 
-        // TODO: Deserialize and deliver
-        // NotificationMessage notif = objectMapper.readValue(payload, NotificationMessage.class);
-        // notificationService.sendToToken(notif.token(), notif.title(), notif.body(), notif.priority(), notif.data());
+        // TODO: Delegate to notification service
+        // notificationService.sendToToken(message.token(), message.title(), message.body(), message.priority(), message.data());
+
+        log.info("[NOTIFICATION SINGLE] Processed successfully for token: {}", message.token());
     }
 }
